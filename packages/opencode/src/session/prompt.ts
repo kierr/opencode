@@ -138,6 +138,9 @@ export namespace SessionPrompt {
     const l = log.clone().tag("session", input.sessionID)
     l.info("prompt")
 
+    // Set the current session ID for MCP servers that require it (like Z.AI)
+    MCP.setCurrentSessionID(input.sessionID)
+
     const session = await Session.get(input.sessionID)
     await SessionRevert.cleanup(session)
 
@@ -1192,6 +1195,9 @@ export namespace SessionPrompt {
       async [Symbol.dispose]() {
         log.info("unlocking", { sessionID })
         state().pending.delete(sessionID)
+
+        // Clear the current session ID for MCP servers
+        MCP.clearCurrentSessionID()
 
         const session = await Session.get(sessionID)
         if (session.parentID) return

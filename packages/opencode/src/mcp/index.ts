@@ -13,6 +13,26 @@ import { Instance } from "../project/instance"
 export namespace MCP {
   const log = Log.create({ service: "mcp" })
 
+  // Track the current active session ID for MCP servers that require it
+  let currentSessionID: string | undefined = undefined
+
+  // Set the current session ID (called when a session becomes active)
+  export function setCurrentSessionID(sessionID: string) {
+    currentSessionID = sessionID
+    log.debug("set current session ID for MCP", { sessionID })
+  }
+
+  // Get the current session ID
+  export function getCurrentSessionID(): string | undefined {
+    return currentSessionID
+  }
+
+  // Clear the current session ID (called when session is no longer active)
+  export function clearCurrentSessionID() {
+    currentSessionID = undefined
+    log.debug("cleared current session ID for MCP")
+  }
+
   export const Failed = NamedError.create(
     "MCPFailed",
     z.object({
@@ -33,12 +53,19 @@ export namespace MCP {
         }
         log.info("found", { key, type: mcp.type })
         if (mcp.type === "remote") {
+          // Check if this is Z.AI's MCP server which requires Session ID header
+          const isZAI = mcp.url.includes("z.ai")
+
           const transports = [
             {
               name: "StreamableHTTP",
               transport: new StreamableHTTPClientTransport(new URL(mcp.url), {
                 requestInit: {
-                  headers: mcp.headers,
+                  headers: {
+                    ...mcp.headers,
+                    // Add Session ID header for Z.AI's MCP server
+                    ...(isZAI && currentSessionID ? { "Session ID": currentSessionID } : {}),
+                  },
                 },
               }),
             },
@@ -46,7 +73,11 @@ export namespace MCP {
               name: "SSE",
               transport: new SSEClientTransport(new URL(mcp.url), {
                 requestInit: {
-                  headers: mcp.headers,
+                  headers: {
+                    ...mcp.headers,
+                    // Add Session ID header for Z.AI's MCP server
+                    ...(isZAI && currentSessionID ? { "Session ID": currentSessionID } : {}),
+                  },
                 },
               }),
             },
