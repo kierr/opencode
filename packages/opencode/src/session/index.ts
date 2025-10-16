@@ -72,6 +72,12 @@ export namespace Session {
   export type ShareInfo = z.output<typeof ShareInfo>
 
   export const Event = {
+    Created: Bus.event(
+      "session.created",
+      z.object({
+        info: Info,
+      }),
+    ),
     Updated: Bus.event(
       "session.updated",
       z.object({
@@ -172,6 +178,9 @@ export namespace Session {
         .catch(() => {
           // Silently ignore sharing errors during session creation
         })
+    Bus.publish(Event.Created, {
+      info: result,
+    })
     Bus.publish(Event.Updated, {
       info: result,
     })

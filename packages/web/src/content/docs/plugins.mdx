@@ -75,6 +75,11 @@ Send notifications when certain events occur:
 export const NotificationPlugin = async ({ project, client, $, directory, worktree }) => {
   return {
     event: async ({ event }) => {
+      // Send notification when a new session is created
+      if (event.type === "session.created") {
+        await $`osascript -e 'display notification "New session created: ${event.properties.info.id}" with title "opencode"'`
+      }
+      
       // Send notification on session completion
       if (event.type === "session.idle") {
         await $`osascript -e 'display notification "Session completed!" with title "opencode"'`
@@ -85,6 +90,26 @@ export const NotificationPlugin = async ({ project, client, $, directory, worktr
 ```
 
 We are using `osascript` to run AppleScript on macOS. Here we are using it to send notifications.
+
+OpenCode supports many event types that you can listen to:
+- `session.created` - Fired when a new session is created
+- `session.updated` - Fired when a session is updated
+- `session.deleted` - Fired when a session is deleted
+- `session.idle` - Fired when a session becomes idle
+- `session.compacted` - Fired when a session is compacted
+- `session.error` - Fired when a session encounters an error
+- `message.updated` - Fired when a message is updated
+- `message.removed` - Fired when a message is removed
+- `message.part.updated` - Fired when a message part is updated
+- `message.part.removed` - Fired when a message part is removed
+- `file.edited` - Fired when a file is edited
+- `file.watcher.updated` - Fired when the file watcher detects changes
+- `permission.updated` - Fired when a permission is updated
+- `permission.replied` - Fired when a permission request is replied to
+- `installation.updated` - Fired when the installation is updated
+- `server.connected` - Fired when the server connects
+- `ide.installed` - Fired when an IDE is installed
+- `lsp.client.diagnostics` - Fired when LSP client diagnostics are available
 
 ---
 

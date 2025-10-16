@@ -1136,6 +1136,13 @@ export type EventSessionIdle = {
   }
 }
 
+export type EventSessionCreated = {
+  type: "session.created"
+  properties: {
+    info: Session
+  }
+}
+
 export type EventSessionUpdated = {
   type: "session.updated"
   properties: {
@@ -1186,6 +1193,7 @@ export type Event =
   | EventFileWatcherUpdated
   | EventTodoUpdated
   | EventSessionIdle
+  | EventSessionCreated
   | EventSessionUpdated
   | EventSessionDeleted
   | EventSessionError
