@@ -76,6 +76,7 @@ export const WriteTool = Tool.define("write", {
       title: path.relative(Instance.worktree, filepath),
       metadata: {
         diagnostics,
+        diff,
         filepath,
         exists: exists,
       },
