@@ -152,6 +152,20 @@ export namespace Session {
     })
   })
 
+  /**
+   * Create and persist a new session Info for the current project.
+   *
+   * If no `id` is provided one will be generated; if no `title` is provided a default timestamped title is used.
+   * The function publishes session Created and Updated events after persisting the session.
+   * If the session has no parent and auto-sharing is enabled, sharing is initiated asynchronously; sharing failures are ignored.
+   *
+   * @param input - Parameters for the new session
+   * @param input.id - Optional explicit session id
+   * @param input.title - Optional session title
+   * @param input.parentID - Optional parent session id (marks this as a child session)
+   * @param input.directory - Directory associated with the session
+   * @returns The created session `Info` object
+   */
   export async function createNext(input: { id?: string; title?: string; parentID?: string; directory: string }) {
     const result: Info = {
       id: Identifier.descending("session", input.id),
